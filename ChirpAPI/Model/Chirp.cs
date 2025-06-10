@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ChirpAPI.Models;
+namespace ChirpAPI.Model;
 
 public partial class Chirp
 {
@@ -17,5 +17,5 @@ public partial class Chirp
 
     public double? Lng { get; set; }
 
-    public virtual ICollection<Commet> Commets { get; set; } = new List<Commet>();
+    public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 }

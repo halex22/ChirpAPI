@@ -1,26 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using ChirpAPI;
 
-namespace ChirpAPI.Models;
+namespace ChirpAPI.Model;
 
-public partial class CinguettioContext : DbContext
+public partial class ChirpContext : DbContext
 {
-    public CinguettioContext()
+    public ChirpContext()
     {
     }
 
-    public CinguettioContext(DbContextOptions<CinguettioContext> options)
+    public ChirpContext(DbContextOptions<ChirpContext> options)
         : base(options)
     {
     }
 
     public virtual DbSet<Chirp> Chirps { get; set; }
 
-    public virtual DbSet<Commet> Commets { get; set; }
+    public virtual DbSet<Comment> Comments { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseNpgsql(AppConfig.GetConfigurationString());
+        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=chirp;Username=postgres;Password=secret;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -45,13 +46,15 @@ public partial class CinguettioContext : DbContext
                 .HasColumnName("text");
         });
 
-        modelBuilder.Entity<Commet>(entity =>
+        modelBuilder.Entity<Comment>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("comment_pk");
 
-            entity.ToTable("commets");
+            entity.ToTable("comments");
 
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("nextval('commets_id_seq'::regclass)")
+                .HasColumnName("id");
             entity.Property(e => e.ChirpId).HasColumnName("chirp_id");
             entity.Property(e => e.CreationDate)
                 .HasDefaultValueSql("now()")
@@ -62,7 +65,7 @@ public partial class CinguettioContext : DbContext
                 .HasMaxLength(140)
                 .HasColumnName("text");
 
-            entity.HasOne(d => d.Chirp).WithMany(p => p.Commets)
+            entity.HasOne(d => d.Chirp).WithMany(p => p.Comments)
                 .HasForeignKey(d => d.ChirpId)
                 .HasConstraintName("chirp_fk");
 

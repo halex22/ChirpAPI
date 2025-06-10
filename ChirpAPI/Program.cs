@@ -1,5 +1,6 @@
 using Npgsql;
 using Microsoft.EntityFrameworkCore;
+using ChirpAPI.Model;
 
 namespace ChirpAPI
 {
@@ -10,7 +11,7 @@ namespace ChirpAPI
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddDbContext<Models.CinguettioContext>(options =>
+            builder.Services.AddDbContext<ChirpContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("postgres")));
 
             builder.Services.AddControllers();

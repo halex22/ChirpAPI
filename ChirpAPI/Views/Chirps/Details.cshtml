@@ -1,4 +1,4 @@
-﻿@model ChirpAPI.Models.Commet
+﻿@model ChirpAPI.Model.Chirp
 
 @{
     ViewData["Title"] = "Details";
@@ -7,7 +7,7 @@
 <h1>Details</h1>
 
 <div>
-    <h4>Commet</h4>
+    <h4>Chirp</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -17,22 +17,28 @@
             @Html.DisplayFor(model => model.Text)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreationDate)
+            @Html.DisplayNameFor(model => model.ExtUrl)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreationDate)
+            @Html.DisplayFor(model => model.ExtUrl)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Chirp)
+            @Html.DisplayNameFor(model => model.CreationTime)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Chirp.Id)
+            @Html.DisplayFor(model => model.CreationTime)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Parent)
+            @Html.DisplayNameFor(model => model.Lat)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Parent.Id)
+            @Html.DisplayFor(model => model.Lat)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Lng)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Lng)
         </dd>
     </dl>
 </div>
