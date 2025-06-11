@@ -12,8 +12,10 @@ namespace ChirpAPI.services.Services.Interfaces
     {
         //Task<List<Chirp>> GetAllChirps();
         Task<List<ChirpModel>> GetChirpsByFilter(ChirpFilter filter);
-        //Task<Chirp?> GetChirpByIdAsync(int id);
-        //Task<Chirp> CreateChirpAsync(Chirp chirp);
+        Task<List<ChirpModel>> GetAllChirps();
+        Task<ChirpModel?> GetChirpById(int id);
+        Task<ChirpModel> CreateChirp(ChirpModel chirp);
+        
         //Task<bool> UpdateChirpAsync(Chirp chirp);
         //Task<bool> DeleteChirpAsync(int id);
     }

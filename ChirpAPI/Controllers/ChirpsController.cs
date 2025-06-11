@@ -28,10 +28,11 @@ namespace ChirpAPI.Controllers
 
         // GET: api/Chirps
         [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<Chirp>>> GetAllChirps()
+        public async Task<IActionResult> GetAllChirps()
         {
             Console.WriteLine("Sto cercando i chirps");
-            return await _context.Chirps.ToListAsync();
+            var result = await _chirpsService.GetAllChirps();
+            return Ok(result);
         }
 
         // GET: api/Chirps?
@@ -53,16 +54,17 @@ namespace ChirpAPI.Controllers
 
         // GET: api/Chirps/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Chirp>> GetChirp([FromRoute] int id)
+        public async Task<IActionResult> GetChirp([FromRoute] int id)
         {
-            var chirp = await _context.Chirps.FindAsync(id);
+            // var chirp = await _context.Chirps.FindAsync(id);
+            var chirp = await _chirpsService.GetChirpById(id);
 
             if (chirp == null)
             {
                 return NotFound();
             }
 
-            return chirp;
+            return Ok(chirp);
         }
 
         // PUT: api/Chirps/5
