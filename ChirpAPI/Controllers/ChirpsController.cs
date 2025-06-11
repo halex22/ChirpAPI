@@ -16,13 +16,11 @@ namespace ChirpAPI.Controllers
     public class ChirpsController : ControllerBase
     {
         private readonly IChirpsService _chirpsService;
-        private readonly ChirpContext _context;
         private readonly ILogger<ChirpsController> _logger;
 
-        public ChirpsController(ChirpContext context, IChirpsService chirpsService, ILogger<ChirpsController> logger)
+        public ChirpsController(IChirpsService chirpsService, ILogger<ChirpsController> logger)
         {
             _chirpsService = chirpsService;
-            _context = context;
             _logger = logger;
         }
 
@@ -72,30 +70,19 @@ namespace ChirpAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutChirp([FromRoute]int id, [FromBody]Chirp chirp)
         {
-            if (id != chirp.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(chirp).State = EntityState.Modified;
+            if (id != chirp.Id) return BadRequest();
 
             try
-            {
-                await _context.SaveChangesAsync();
+            { 
+                await _chirpsService.UpdateChirp(id, chirp);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!ChirpExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
 
             return NoContent();
+
         }
 
         // POST: api/Chirps
@@ -103,8 +90,7 @@ namespace ChirpAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Chirp>> PostChirp([FromBody]Chirp chirp)
         {
-            _context.Chirps.Add(chirp);
-            await _context.SaveChangesAsync();
+            await _chirpsService.CreateChirp(chirp);
 
             return CreatedAtAction("GetChirp", new { id = chirp.Id }, chirp);
         }
@@ -113,21 +99,18 @@ namespace ChirpAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteChirp(int id)
         {
-            var chirp = await _context.Chirps.FindAsync(id);
-            if (chirp == null)
+            try
+            {
+                await _chirpsService.DeleteChirp(id);
+            }
+            catch
             {
                 return NotFound();
             }
 
-            _context.Chirps.Remove(chirp);
-            await _context.SaveChangesAsync();
-
             return NoContent();
+
         }
 
-        private bool ChirpExists(int id)
-        {
-            return _context.Chirps.Any(e => e.Id == id);
-        }
     }
 }

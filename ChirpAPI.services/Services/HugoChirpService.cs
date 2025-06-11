@@ -22,22 +22,24 @@ namespace ChirpAPI.services.Services
 
         
 
-        public Task<ChirpModel> CreateChirp(ChirpModel chirp)
+        public async Task CreateChirp(Chirp chirp)
         {
-            throw new NotImplementedException();
+            _context.Chirps.Add(chirp);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteChirp(int id)
+        {
+            var chirp = await _context.Chirps.FindAsync(id);
+            if (chirp == null) throw new KeyNotFoundException($"Chirp with ID {id} not found.");
+
+            _context.Chirps.Remove(chirp);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<List<ChirpModel>> GetAllChirps()
         {
-             return await _context.Chirps.Select(x => new ChirpModel
-            {
-                Id = x.Id,
-                Text = x.Text,
-                ExtUrl = x.ExtUrl,
-                Lat = x.Lat,
-                Lng = x.Lng,
-
-            }).ToListAsync();
+             return await _context.Chirps.Select(x => ConvertChirp(x)).ToListAsync();
         }
 
         public async Task<ChirpModel?> GetChirpById(int id)
@@ -53,7 +55,6 @@ namespace ChirpAPI.services.Services
             if (!string.IsNullOrWhiteSpace(filter.Text))
             {
                 query = query.Where(x => x.Text == filter.Text);
-                // return await _context.Chirps.ToListAsync();
             }
             var result = await query.Select(x => ConvertChirp(x)).ToListAsync();
 
@@ -61,8 +62,10 @@ namespace ChirpAPI.services.Services
 
         }
 
-        async Task PutChirp(int id, Chirp chirp)
+        public async Task UpdateChirp(int id, Chirp chirp)
         {
+            if (!ChirpExists(id)) throw new KeyNotFoundException($"Chirp with ID {id} not found.");
+
             _context.Entry(chirp).State = EntityState.Modified;
 
             try
@@ -71,14 +74,7 @@ namespace ChirpAPI.services.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ChirpExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
         }
 
@@ -95,5 +91,7 @@ namespace ChirpAPI.services.Services
                 Lng = rawChirp.Lng,
             };
         }
+
+
     }
 }
