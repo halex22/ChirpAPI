@@ -21,7 +21,7 @@ public partial class ChirpContext : DbContext
     public virtual DbSet<Comment> Comments { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=chirp;Username=postgres;Password=superpippo;TrustServerCertificate=True");
+        => optionsBuilder.UseNpgsql(AppConfig.GetConfigurationString());
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

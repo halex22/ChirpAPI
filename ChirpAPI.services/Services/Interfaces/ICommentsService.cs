@@ -12,7 +12,7 @@ namespace ChirpAPI.services.Services.Interfaces
 {
     public interface ICommentsService
     {
-        Task<List<Comment>> GetAllComments();
+        Task<List<CommentDTO>> GetAllComments();
         Task<List<Comment>> GetCommentsByChirpId(int chirpId);
         Task<Comment> CreateComment(CommentCreateDTO comment);
         Task UpdateComment(Comment comment);

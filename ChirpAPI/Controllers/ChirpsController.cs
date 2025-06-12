@@ -66,6 +66,14 @@ namespace ChirpAPI.Controllers
             return Ok(chirp);
         }
 
+        // GET: api/Chirps/5/comments
+        [HttpGet("{id}/comments")]
+        public async Task<IActionResult> GetChirpComments([FromRoute]int id)
+        {
+            var comments = await _chirpsService.GetChirpsComments(id);
+            return Ok(comments);
+        }
+
         // PUT: api/Chirps/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -76,13 +84,18 @@ namespace ChirpAPI.Controllers
             try
             { 
                 await _chirpsService.UpdateChirp(id, chirp);
+                return NoContent();
             }
-            catch (Exception ex)
+            catch (KeyNotFoundException)
             {
                 return NotFound();
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                return StatusCode(500, "An error occurred while updating the chirp.");
+            }
 
-            return NoContent();
+            
 
         }
 
@@ -93,7 +106,11 @@ namespace ChirpAPI.Controllers
         {
             Chirp newChirp = await _chirpsService.CreateChirp(chirp);
 
-            return Ok(newChirp);
+            return CreatedAtAction(
+                nameof(GetChirp),
+                new {id = newChirp.Id},
+                newChirp
+                );
         }
 
         // DELETE: api/Chirps/5

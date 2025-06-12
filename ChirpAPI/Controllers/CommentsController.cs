@@ -29,9 +29,9 @@ namespace ChirpAPI.Controllers
 
         // GET: api/Comments
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Comment>>> GetComments()
+        public async Task<IActionResult> GetComments()
         {
-            return await _context.Comments.ToListAsync();
+            return Ok(await _commentService.GetAllComments());
         }
 
         // GET: api/Comments/5

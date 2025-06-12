@@ -18,6 +18,7 @@ namespace ChirpAPI.services.Services.Interfaces
         Task<Chirp> CreateChirp(ChirpCreateDTO chirp);
         Task UpdateChirp(int id, Chirp chirp);
         Task DeleteChirp(int id);
+        Task<List<ChirpCommentDTO>> GetChirpsComments(int id);
 
         //Task<bool> UpdateChirpAsync(Chirp chirp);
         //Task<bool> DeleteChirpAsync(int id);

@@ -120,6 +120,17 @@ namespace ChirpAPI.services.Services
             };
         }
 
-
+        public async Task<List<ChirpCommentDTO>> GetChirpsComments(int id)
+        {
+            return await _context.Comments
+                .Where(c => c.ChirpId == id)
+                .Select(c => new ChirpCommentDTO
+                {
+                    Id = c.Id,
+                    Text = c.Text,
+                    CreationDate = c.CreationDate
+                } )
+                .ToListAsync();
+        }
     }
 }

@@ -34,9 +34,9 @@ namespace ChirpAPI.services.Services
             {
                 await _context.SaveChangesAsync();
             }
-            catch (Exception ex)
+            catch (DbUpdateException)
             {
-                throw new Exception($"An error occurred while creating the comment: {ex.Message}", ex);
+                throw;
             }
             return comment;
 
@@ -59,9 +59,18 @@ namespace ChirpAPI.services.Services
 
         }
 
-        public async Task<List<Comment>> GetAllComments()
+        public async Task<List<CommentDTO>> GetAllComments()
         {
-            return await _context.Comments.ToListAsync();
+            return await _context.Comments
+                .Select( c => new CommentDTO
+                {
+                    Id = c.Id,
+                    Text = c.Text,
+                    CreationDate = c.CreationDate,
+                    ChirpId= c.ChirpId,
+                    ParentId= c.ParentId,
+                })
+                .ToListAsync();
         }
 
         public Task<List<Comment>> GetCommentsByChirpId(int chirpId)
