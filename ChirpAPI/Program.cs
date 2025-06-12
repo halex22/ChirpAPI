@@ -4,6 +4,8 @@ using ChirpAPI.Model;
 using ChirpAPI.services.Services.Interfaces;
 using ChirpAPI.services.Services;
 using Serilog;
+using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 namespace ChirpAPI
 {
@@ -16,6 +18,17 @@ namespace ChirpAPI
                 .ReadFrom.Configuration(builder.Configuration)
                 .CreateLogger();
 
+            builder.Host.UseSerilog();
+
+            builder.Services.AddSwaggerGen(options =>
+                options.SwaggerDoc("v3", new OpenApiInfo
+                {
+                    Title = "Chirp API",
+                    Version = "v3",
+                    Description = "API for managing chirps and comments."
+                })
+            ); 
+
             // Add services to the container.
             builder.Services.AddDbContext<ChirpContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("postgres")));
@@ -25,6 +38,13 @@ namespace ChirpAPI
             builder.Services.AddScoped<IChirpsService, HugoChirpService>();
 
             var app = builder.Build();
+
+            app.UseSwagger(c =>
+                c.OpenApiVersion = OpenApiSpecVersion.OpenApi3_0
+            );
+            app.UseSwaggerUI( c =>
+                c.SwaggerEndpoint("v3/swagger.json", "Chirp API V1")
+            );
 
             //builder.Services.AddCors(options =>
             //    options.AddPolicy("AllowAllOrigins",

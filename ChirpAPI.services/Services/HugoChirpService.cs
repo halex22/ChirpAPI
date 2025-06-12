@@ -1,4 +1,5 @@
 ﻿using ChirpAPI.Model;
+using ChirpAPI.services.Model.DTOs;
 using ChirpAPI.services.Services.Interfaces;
 using ChirpAPI.services.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -22,15 +23,35 @@ namespace ChirpAPI.services.Services
 
         
 
-        public async Task CreateChirp(Chirp chirp)
+        public async Task<Chirp> CreateChirp(ChirpCreateDTO chirp)
         {
-            _context.Chirps.Add(chirp);
+            var newChirp = new Chirp
+            {
+                Text = chirp.Text,
+                ExtUrl = chirp.ExtUrl,
+                Lat = chirp.Lat,
+                Lng = chirp.Lng
+            };
+            _context.Chirps.Add(newChirp);
             await _context.SaveChangesAsync();
+            return newChirp;
         }
 
         public async Task DeleteChirp(int id)
         {
-            var chirp = await _context.Chirps.FindAsync(id);
+            // first check 
+            //Chirp? entity = await _context.Chirps
+            //    .Include(chirp => chirp.Comments)
+            //    .Where(comment => comment.Id == id)
+            //    .SingleOrDefaultAsync();
+
+            //// second check
+            //if (entity != null && entity.Comments.Any())
+            //{
+            //    throw new InvalidOperationException($"Chirp with ID {id} cannot be deleted because it has associated comments.");
+            //}
+
+            Chirp? chirp = await _context.Chirps.FindAsync(id);
             if (chirp == null) throw new KeyNotFoundException($"Chirp with ID {id} not found.");
 
             _context.Chirps.Remove(chirp);
@@ -64,9 +85,15 @@ namespace ChirpAPI.services.Services
 
         public async Task UpdateChirp(int id, Chirp chirp)
         {
-            if (!ChirpExists(id)) throw new KeyNotFoundException($"Chirp with ID {id} not found.");
+            var entity = await _context.Chirps.FindAsync(id);
+            if (entity == null) throw new KeyNotFoundException($"Chirp with ID {id} not found.");
 
-            _context.Entry(chirp).State = EntityState.Modified;
+            if (!string.IsNullOrWhiteSpace(chirp.Text)) entity.Text = chirp.Text;
+            if (!string.IsNullOrWhiteSpace(chirp.ExtUrl)) entity.ExtUrl = chirp.ExtUrl;
+            if (chirp.Lat != null) entity.Lat = chirp.Lat;
+            if (chirp.Lng != null) entity.Lng = chirp.Lng;
+
+            _context.Entry(entity).State = EntityState.Modified;
 
             try
             {
@@ -74,13 +101,14 @@ namespace ChirpAPI.services.Services
             }
             catch (DbUpdateConcurrencyException)
             {
-                throw;
+                throw;    
             }
+
         }
 
         private bool ChirpExists(int chirpId) => _context.Chirps.Any(c => c.Id == chirpId);
 
-        private ChirpModel ConvertChirp(Chirp rawChirp)
+        private static ChirpModel ConvertChirp(Chirp rawChirp) // why static ????? memory leak 
         {
             return new ChirpModel
             {

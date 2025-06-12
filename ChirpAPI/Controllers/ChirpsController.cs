@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ChirpAPI.Model;
 using ChirpAPI.services.ViewModels;
 using ChirpAPI.services.Services.Interfaces;
+using ChirpAPI.services.Model.DTOs;
 
 namespace ChirpAPI.Controllers
 {
@@ -88,11 +89,11 @@ namespace ChirpAPI.Controllers
         // POST: api/Chirps
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Chirp>> PostChirp([FromBody]Chirp chirp)
+        public async Task<IActionResult> PostChirp([FromBody]ChirpCreateDTO chirp)
         {
-            await _chirpsService.CreateChirp(chirp);
+            Chirp newChirp = await _chirpsService.CreateChirp(chirp);
 
-            return CreatedAtAction("GetChirp", new { id = chirp.Id }, chirp);
+            return Ok(newChirp);
         }
 
         // DELETE: api/Chirps/5

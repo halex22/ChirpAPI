@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ChirpAPI.Model;
+using ChirpAPI.services.Services.Interfaces;
+using ChirpAPI.services.Model.DTOs;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ChirpAPI.Controllers
 {
@@ -14,10 +17,14 @@ namespace ChirpAPI.Controllers
     public class CommentsController : ControllerBase
     {
         private readonly ChirpContext _context;
+        private readonly ILogger<CommentsController> _logger;
+        private readonly ICommentsService _commentService;
 
-        public CommentsController(ChirpContext context)
+        public CommentsController(ChirpContext context, ILogger<CommentsController> logger, ICommentsService commentsService)
         {
             _context = context;
+            _logger = logger;
+            _commentService = commentsService;
         }
 
         // GET: api/Comments
@@ -75,12 +82,19 @@ namespace ChirpAPI.Controllers
         // POST: api/Comments
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Comment>> PostComment(Comment comment)
+        public async Task<IActionResult> PostComment(CommentCreateDTO comment)
         {
-            _context.Comments.Add(comment);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetComment", new { id = comment.Id }, comment);
+            Comment createdComment;
+            try
+            {
+                createdComment = await _commentService.CreateComment(comment);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating comment");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while creating the comment.");
+            }
+            return Ok(createdComment);
         }
 
         // DELETE: api/Comments/5
